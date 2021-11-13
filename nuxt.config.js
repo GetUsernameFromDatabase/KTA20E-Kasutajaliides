@@ -1,5 +1,5 @@
-import colors from 'vuetify/es5/util/colors'
-require('dotenv').config()
+import colors from 'vuetify/es5/util/colors';
+require('dotenv').config();
 export default {
   server: {
     port: 3000,
@@ -74,4 +74,4 @@ export default {
   publicRuntimeConfig: {
     googleApiKey: process.env.GOOGLE_API_KEY
   },
-}
+};

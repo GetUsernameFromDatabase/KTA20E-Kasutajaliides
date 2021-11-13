@@ -1,11 +1,33 @@
 <template>
-   <canvas ref="myChart"></canvas>
+  <canvas ref="myChart" />
 </template>
 
 <script>
 import Chart from 'chart.js/auto';
 export default {
+    name: 'CovidChart',
     props: ['labels', 'data', 'dataLabel'],
+    data(){
+        return {
+            chart: null
+        };
+    },
+    watch: {
+        dataLabel(newLabel){
+            this.chart.data.datasets[0].label = newLabel;
+            this.chart.update();
+            console.log(this.chart);
+        },
+        data(newData){
+            this.chart.data.datasets[0].data = newData;
+            this.chart.update();
+            console.log(this.chart);
+        },
+        labels(newLabels){
+            this.chart.data.labels = newLabels;
+            this.chart.update();
+        }
+    },
     created(){
       
     },
@@ -31,29 +53,8 @@ export default {
             this.$refs['myChart'],
             config
         ); 
-    },
-    data(){
-        return {
-            chart: null
-        }
-    },
-    watch: {
-        dataLabel(newLabel){
-            this.chart.data.datasets[0].label = newLabel;
-            this.chart.update();
-            console.log(this.chart);
-        },
-        data(newData){
-            this.chart.data.datasets[0].data = newData;
-            this.chart.update();
-            console.log(this.chart);
-        },
-        labels(newLabels){
-            this.chart.data.labels = newLabels;
-            this.chart.update();
-        }
     }
-}
+};
 </script>
 
 <style>
