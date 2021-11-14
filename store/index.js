@@ -10,13 +10,14 @@ export const state = () => ({
     { name: 'Total Deaths Asc', field: 'TotalDeaths', order: 'asc' },
     { name: 'Total Deaths Desc', field: 'TotalDeaths', order: 'desc' },
     { name: 'New Deaths Asc', field: 'NewDeaths', order: 'asc' },
-    { name: 'New Deaths Desc', field: 'NewDeaths', order: 'desc' }
+    { name: 'New Deaths Desc', field: 'NewDeaths', order: 'desc' },
   ],
   sort: {
     name: 'Total Confirmed Desc',
     field: 'TotalConfirmed',
-    order: 'desc'
+    order: 'desc',
   },
+  selectedDates: { from: '', to: new Date().toISOString().substr(0, 10) },
 });
 
 export const mutations = {
@@ -31,30 +32,46 @@ export const mutations = {
   },
   SET_COUNTRY(state, country) {
     state.country = country;
-  }
+  },
+  SET_DATES(state, { from, to } = {}) {
+    // "to" must be defined
+    const desiredDates = {
+      from: from || state.selectedDates.from,
+      to:
+        to || state.selectedDates.to || new Date().toISOString().substr(0, 10),
+    };
+    const desiredDateValues = [
+      new Date(desiredDates.from).valueOf(),
+      new Date(desiredDates.to).valueOf(),
+    ];
+
+    if (desiredDateValues[0] > desiredDateValues[1])
+      desiredDates.from = desiredDates.to;
+    state.selectedDates = desiredDates;
+  },
 };
 
 export const actions = {
   getSummary(context) {
-    this.$axios.get('https://api.covid19api.com/summary').then(response => {
+    this.$axios.get('https://api.covid19api.com/summary').then((response) => {
       context.commit('SET_COUNTRIES', response.data.Countries);
     });
   },
   getCountry(context, slug) {
     this.$axios
       .get('https://api.covid19api.com/country/' + slug)
-      .then(response => {
+      .then((response) => {
         context.commit('SET_COUNTRY', response.data);
       });
-  }
+  },
 };
 
 export const getters = {
   countryNames(state) {
-    return state.countries.map(country => country.Country);
+    return state.countries.map((country) => country.Country);
   },
   filteredCountries(state) {
-    return state.countries.filter(country => {
+    return state.countries.filter((country) => {
       return (
         state.search.toLowerCase() ===
         country.Country.substr(0, state.search.length).toLowerCase()
@@ -73,12 +90,17 @@ export const getters = {
     });
   },
   labels(state) {
-    return state.country.map(data => new Date(data.Date).toLocaleDateString());
+    return state.country.map((data) =>
+      new Date(data.Date).toLocaleDateString()
+    );
   },
   confirmed(state) {
-    return state.country.map(data => data.Confirmed);
+    return state.country.map((data) => data.Confirmed);
   },
   deaths(state) {
-    return state.country.map(data => data.Deaths);
-  }
+    return state.country.map((data) => data.Deaths);
+  },
+  selectedDates(state) {
+    return state.selectedDates;
+  },
 };
