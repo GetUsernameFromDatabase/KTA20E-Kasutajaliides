@@ -5,7 +5,7 @@
 <script>
 import { Loader } from '@googlemaps/js-api-loader';
 
-function addMarker(location, map) {
+function addMarker(location, map, removeEvent = true) {
   // https://developers.google.com/maps/documentation/javascript/markers#marker_labels
   // eslint-disable-next-line no-undef
   const marker = new google.maps.Marker({
@@ -13,11 +13,13 @@ function addMarker(location, map) {
     map: map,
   });
 
-  // https://developers.google.com/maps/documentation/javascript/infowindows#open
-  marker.addListener('click', () => {
-    // https://developers.google.com/maps/documentation/javascript/markers#remove
-    marker.setMap(null);
-  });
+  if (removeEvent) {
+    // https://developers.google.com/maps/documentation/javascript/infowindows#open
+    marker.addListener('click', () => {
+      // https://developers.google.com/maps/documentation/javascript/markers#remove
+      marker.setMap(null);
+    });
+  }
 
   return marker;
 }
@@ -73,10 +75,13 @@ export default {
   methods: {
     /** @param {{lat: Number, lng: Number}[]} coordinates */
     updatePropMarkers: function (coordinates) {
+      /* Ideas for Improvement:
+      Make it filter out new coordinates and only add those */
+      
       this.propMarkers.forEach((marker) => {
         marker.setMap(null);
       });
-      this.propMarkers = coordinates.map((coord) => addMarker(coord, this.map));
+      this.propMarkers = coordinates.map((coord) => addMarker(coord, this.map, false));
     },
   },
 };
