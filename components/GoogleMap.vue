@@ -37,7 +37,8 @@ export default {
   data() {
     return {
       map: null,
-      markers: [],
+      propMarkers: [],
+      userMarkers: [],
     };
   },
   watch: {
@@ -46,6 +47,9 @@ export default {
     },
     zoom(newZoom) {
       this.map.setZoom(newZoom);
+    },
+    markerCoordinates(newCoords) {
+      this.updatePropMarkers(newCoords);
     },
   },
   mounted() {
@@ -59,14 +63,21 @@ export default {
         center: this.center,
         zoom: this.zoom,
       });
-      this.markers = this.markerCoordinates.map((coord) =>
-        addMarker(coord, this.map)
-      );
+      this.updatePropMarkers(this.markerCoordinates);
 
       google.maps.event.addListener(this.map, 'click', (event) => {
-        this.markers.push(addMarker(event.latLng, this.map));
+        this.userMarkers.push(addMarker(event.latLng, this.map));
       });
     });
+  },
+  methods: {
+    /** @param {{lat: Number, lng: Number}[]} coordinates */
+    updatePropMarkers: function (coordinates) {
+      this.propMarkers.forEach((marker) => {
+        marker.setMap(null);
+      });
+      this.propMarkers = coordinates.map((coord) => addMarker(coord, this.map));
+    },
   },
 };
 </script>
